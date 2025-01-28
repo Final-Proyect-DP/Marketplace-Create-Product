@@ -1,47 +1,47 @@
 from flask import request, jsonify
 from app.models.models import Product, Category  # Update the import path
 from app.extensions.extensions import db
+from app.webhook.webhook import send_webhook  # Import the new webhook function
 import requests
-import base64  # Para codificar la imagen en Base64
+import base64  # To encode the image in Base64
 
-WEBHOOK_URL = "http://localhost:5003/webhook"  # URL del webhook del microservicio get
-
+WEBHOOK_URL = "http://localhost:5003/webhook"  # Webhook URL of the get microservice
 
 def create_item():
     data = request.form
     image = request.files.get('image')
 
-    # Validar campos requeridos
+    # Validate required fields
     if not data.get('name') or not data.get('description') or not data.get('price'):
         return jsonify({"message": "Missing required fields"}), 400
 
-    # Validar category_id si se proporciona
+    # Validate category_id if provided
     category_id = data.get('category_id')
     if category_id:
         category = Category.query.filter_by(id=category_id).first()
         if not category:
             return jsonify({"message": "Category not found"}), 404
 
-    # Leer imagen en formato binario
+    # Read image in binary format
     image_data = None
     if image:
         image_data = image.read()
 
-    # Crear el nuevo producto
+    # Create the new product
     new_product = Product(
         name=data['name'],
         description=data['description'],
         price=data['price'],
         userId=data.get('userId'),
         image_data=image_data,
-        category_id=category_id  # Usar directamente el ID de la categoría
+        category_id=category_id  # Use the category ID directly
     )
 
     try:
         db.session.add(new_product)
         db.session.commit()
 
-        # Preparar los datos para el webhook
+        # Prepare data for the webhook
         webhook_data = {
             "id": new_product.id,
             "name": new_product.name,
@@ -53,10 +53,8 @@ def create_item():
             "category_id": new_product.category_id
         }
 
-        # Enviar los datos al webhook del microservicio get
-        response = requests.post(WEBHOOK_URL, json=webhook_data)
-        if response.status_code != 200:
-            print(f"Error sincronizando producto: {response.text}")
+        # Send data to the get microservice webhook
+        send_webhook(webhook_data)
 
         return jsonify({
             "message": "Product created successfully",
@@ -67,16 +65,14 @@ def create_item():
         db.session.rollback()
         return jsonify({"message": f"Error creating product: {str(e)}"}), 500
 
-
-
 def create_category():
     data = request.get_json()
 
-    # Validar que los campos obligatorios estén presentes
+    # Validate that required fields are present
     if not data.get('name'):
         return jsonify({"message": "Missing required fields"}), 400
 
-    # Crear la categoría en la base de datos
+    # Create the category in the database
     new_category = Category(
         name=data['name'],
         description=data.get('description')
@@ -86,17 +82,15 @@ def create_category():
         db.session.add(new_category)
         db.session.commit()
 
-        # Preparar los datos para el webhook
+        # Prepare data for the webhook
         webhook_data = {
             "id": new_category.id,
             "name": new_category.name,
             "description": new_category.description
         }
 
-        # Enviar los datos al webhook del microservicio get
-        response = requests.post(WEBHOOK_URL, json=webhook_data)
-        if response.status_code != 200:
-            print(f"Error sincronizando categoría: {response.text}")
+        # Send data to the get microservice webhook
+        send_webhook(webhook_data)
 
         return jsonify({
             "message": "Category created successfully",

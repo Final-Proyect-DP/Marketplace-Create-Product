@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, jsonify
 from app.controllers.controllers import create_item, create_category  # Update the import path
 from app.models.models import Product  # Update the import path
+from app.webhook.webhook import send_webhook  # Import the new webhook function
 
 # Definir un blueprint para la creación de productos
 create_bp = Blueprint('create', __name__)
