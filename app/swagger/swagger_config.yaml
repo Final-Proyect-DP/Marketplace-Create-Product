@@ -1,0 +1,139 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Create Service API"
+  description: "API documentation for the Create Service"
+paths:
+  /items:
+    post:
+      description: "Create a new product"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: "name"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Name of the product"
+        - name: "description"
+          in: "formData"
+          type: "string"
+          required: true
+          description: "Description of the product"
+        - name: "price"
+          in: "formData"
+          type: "number"
+          format: "float"
+          required: true
+          description: "Price of the product"
+        - name: "userId"
+          in: "formData"
+          type: "string"
+          required: false
+          description: "ID of the user creating the product"
+        - name: "image"
+          in: "formData"
+          type: "file"
+          required: false
+          description: "Image file of the product (JPEG/PNG format)"
+        - name: "category_id"
+          in: "formData"
+          type: "integer"
+          required: false
+          description: "ID of the category for the product"
+      responses:
+        201:
+          description: "Product created successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+              product:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                  name:
+                    type: "string"
+                  description:
+                    type: "string"
+                  price:
+                    type: "number"
+                    format: "float"
+                  userId:
+                    type: "string"
+                  created_at:
+                    type: "string"
+                    format: "date-time"
+                  category_id:
+                    type: "integer"
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - created_at
+        400:
+          description: "Invalid input"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+        500:
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+  /categories:
+    post:
+      description: "Create a new category"
+      consumes:
+        - application/json
+      parameters:
+        - name: "body"
+          in: "body"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              name:
+                type: "string"
+                description: "Name of the category"
+              description:
+                type: "string"
+                description: "Description of the category"
+      responses:
+        201:
+          description: "Category created successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+              category:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                  name:
+                    type: "string"
+                  description:
+                    type: "string"
+        400:
+          description: "Invalid input"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+        500:
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
