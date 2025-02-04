@@ -74,8 +74,7 @@ def create_category():
 
     # Create the category in the database
     new_category = Category(
-        name=data['name'],
-        description=data.get('description')
+        name=data['name']
     )
 
     try:
@@ -85,8 +84,7 @@ def create_category():
         # Prepare data for the webhook
         webhook_data = {
             "id": new_category.id,
-            "name": new_category.name,
-            "description": new_category.description
+            "name": new_category.name
         }
 
         # Send data to the get microservice webhook
