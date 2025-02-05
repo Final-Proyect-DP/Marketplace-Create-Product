@@ -14,4 +14,4 @@ def send_webhook(data):
             print("Database connection error. Please check your MySQL server.")
         elif "INSERT INTO `Categories`" in response.text:
             print("Error creating category. Please check the category data and try again.")
-        # Add more specific error handling as needed
+

@@ -4,8 +4,9 @@ from app.extensions.extensions import db
 from app.webhook.webhook import send_webhook  # Import the new webhook function
 import requests
 import base64  # To encode the image in Base64
+import os  # Add import for os
 
-WEBHOOK_URL = "http://localhost:5003/webhook"  # Webhook URL of the get microservice
+WEBHOOK_URL = os.getenv('WEBHOOK_URL')  # Use environment variable for webhook URL
 
 def create_item():
     data = request.form

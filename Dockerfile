@@ -21,9 +21,4 @@ ENV FLASK_APP=app
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the Flask application
-# Print environment variables for debugging
-RUN printenv
-
-# Run the Flask application
-
 CMD ["flask", "run"]
