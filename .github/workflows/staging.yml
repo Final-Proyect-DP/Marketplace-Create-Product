@@ -66,6 +66,10 @@ jobs:
           chmod 600 key.pem
           ls -l key.pem
 
+      - name: Print SSH Key Content (Debug)
+        run: |
+          cat key.pem
+
       - name: Debug SSH Connection
         uses: appleboy/ssh-action@v0.1.0
         with:
