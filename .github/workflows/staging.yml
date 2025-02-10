@@ -94,6 +94,6 @@ jobs:
             sudo docker run -d \
               --name product-create \
               -p 5000:5000 \
-              --restart unless-stopped \    
+              --restart unless-stopped \     
               fernando785/marketplace-create_product:latest
             sudo docker system prune -af --volumes || true
