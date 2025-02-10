@@ -60,6 +60,17 @@ jobs:
           - ec2-13-216-190-210.compute-1.amazonaws.com
 
     steps:
+      - name: Debug SSH Connection
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ matrix.ec2_instance }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY_FERNANDO }}
+          port: 22
+          timeout: "120s"
+          script: |
+            echo "SSH connection successful"
+
       - name: Deploy Container
         uses: appleboy/ssh-action@v0.1.0
         with:
