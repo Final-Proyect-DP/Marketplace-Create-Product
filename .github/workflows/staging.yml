@@ -60,6 +60,12 @@ jobs:
           - ec2-13-216-190-210.compute-1.amazonaws.com
 
     steps:
+      - name: Check SSH Key Permissions
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY_FERNANDO }}" > key.pem
+          chmod 600 key.pem
+          ls -l key.pem
+
       - name: Debug SSH Connection
         uses: appleboy/ssh-action@v0.1.0
         with:
