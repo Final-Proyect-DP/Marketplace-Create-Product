@@ -62,7 +62,7 @@ jobs:
     steps:
       - name: Check SSH Key Permissions
         run: |
-          echo "${{ secrets.EC2_SSH_KEY_FERNANDO }}" > key.pem
+          echo "${{ secrets.EC2_SSH_KEY_FERNANDO }}" | tr -d '\r' > key.pem
           chmod 600 key.pem
           ls -l key.pem
 
