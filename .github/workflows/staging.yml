@@ -67,7 +67,10 @@ jobs:
           ls -l key.pem
 
       - name: Add Host to Known Hosts
-        run: ssh-keyscan -H ${{ matrix.ec2_instance }} >> ~/.ssh/known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ matrix.ec2_instance }} >> ~/.ssh/known_hosts
+
 
       - name: Debug SSH Connection
         uses: appleboy/ssh-action@v1.0.3
