@@ -67,7 +67,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY_FERNANDO }}
           port: 22
-          timeout: "120s"
+          timeout: "120s" 
           script: |
             set -e
             echo "Deploying image: fernando785/marketplace-create_product:latest"
