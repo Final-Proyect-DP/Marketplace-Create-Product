@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Create .env file
         env:
@@ -60,14 +60,17 @@ jobs:
           - ec2-13-216-190-210.compute-1.amazonaws.com
 
     steps:
-      - name: Check SSH Key Permissions
+      - name: Configure SSH Key
         run: |
-          echo "${{ secrets.EC2_SSH_KEY_FERNANDO }}" | tr -d '\r' > key.pem
+          echo "${{ secrets.EC2_SSH_KEY_FERNANDO }}" | base64 --decode > key.pem
           chmod 600 key.pem
           ls -l key.pem
 
+      - name: Add Host to Known Hosts
+        run: ssh-keyscan -H ${{ matrix.ec2_instance }} >> ~/.ssh/known_hosts
+
       - name: Debug SSH Connection
-        uses: appleboy/ssh-action@v0.1.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ matrix.ec2_instance }}
           username: ec2-user
@@ -76,15 +79,15 @@ jobs:
           timeout: "120s"
           script: |
             echo "SSH connection successful"
- 
+
       - name: Deploy Container
-        uses: appleboy/ssh-action@v0.1.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ matrix.ec2_instance }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY_FERNANDO }}
           port: 22
-          timeout: "120s" 
+          timeout: "120s"
           script: |
             set -e
             echo "Deploying image: fernando785/marketplace-create_product:latest"
@@ -94,6 +97,6 @@ jobs:
             sudo docker run -d \
               --name product-create \
               -p 5000:5000 \
-              --restart unless-stopped \     
+              --restart unless-stopped \
               fernando785/marketplace-create_product:latest
             sudo docker system prune -af --volumes || true
