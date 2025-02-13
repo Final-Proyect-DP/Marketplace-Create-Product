@@ -24,7 +24,7 @@ jobs:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL_PRODUCCION }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          echo "WEBHOOK_URL=${WEBHOOK_URL_PRODUCCION}" > .env
+          echo "WEBHOOK_URL=${WEBHOOK_URL}" > .env
           echo "DATABASE_URL=${DATABASE_URL}" >> .env
 
       - name: Set up Docker Buildx
