@@ -1,11 +1,14 @@
-name: Deploy on staging environment
+name: Deploy to production Environment
 
 on:
-  push:
-    branches: [Marketplace/createProduct]
+  pull_request:
+    types: [closed] 
+    branches: [main]
+
 
 jobs:
   build_docker_image:
+    if: github.event.pull_request.merged == true
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
 
@@ -18,10 +21,10 @@ jobs:
 
       - name: Create .env file
         env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL_PRODUCCION }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          echo "WEBHOOK_URL=${WEBHOOK_URL}" > .env
+          echo "WEBHOOK_URL=${WEBHOOK_URL_PRODUCCION}" > .env
           echo "DATABASE_URL=${DATABASE_URL}" >> .env
 
       - name: Set up Docker Buildx
@@ -46,7 +49,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: fernando785/marketplace-create_product:latest
+          tags: fernando785/marketplace-create_product:amdin
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -57,12 +60,12 @@ jobs:
     strategy:
       matrix:
         ec2_instance: 
-          - ec2-13-216-190-210.compute-1.amazonaws.com
+          - ec2-54-86-96-131.compute-1.amazonaws.com
 
     steps:
       - name: Configure SSH Key
         run: |
-          echo "${{ secrets.EC2_SSH_NEW }}" > key.pem
+          echo "${{ secrets.EC2_SSH_KEY_FERNANDO }}" > key.pem
           chmod 600 key.pem
           ls -l key.pem
 
@@ -77,7 +80,7 @@ jobs:
         with:
           host: ${{ matrix.ec2_instance }}
           username: ec2-user
-          key: ${{ secrets.EC2_SSH_NEW }}
+          key: ${{ secrets.EC2_SSH_KEY_FERNANDO }}
           port: 22
           timeout: "120s"
           script: |
@@ -88,20 +91,18 @@ jobs:
         with:
           host: ${{ matrix.ec2_instance }}
           username: ec2-user
-          key: ${{ secrets.EC2_SSH_NEW }}
+          key: ${{ secrets.EC2_SSH_KEY_FERNANDO }}
           port: 22
           timeout: "120s"
           script: |
             set -e
-            echo "Deploying image: fernando785/marketplace-create_product:latest"
+            echo "Deploying image: fernando785/marketplace-create_product:main"
             sudo docker stop product-create || true
             sudo docker rm product-create || true
-            sudo docker pull fernando785/marketplace-create_product:latest
+            sudo docker pull fernando785/marketplace-create_product:main
             sudo docker run -d \
               --name product-create \
               -p 5000:5000 \
               --restart unless-stopped \
-              fernando785/marketplace-create_product:latest
+              fernando785/marketplace-create_product:main
             sudo docker system prune -af --volumes || true
-
-

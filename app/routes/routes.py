@@ -14,3 +14,7 @@ def create_or_update_product():
 def create_new_category():
     return create_category()  # Llamar a la función que maneja la creación de la categoría
 
+@create_bp.route('/health', methods=['GET'])
+def health_check():
+    return jsonify(status='OK', service='user-read'), 200
+
